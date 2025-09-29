@@ -24,6 +24,7 @@ var (
 	rxPositive             = regexp.MustCompile(`(?i)article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story`)
 	rxNegative             = regexp.MustCompile(`(?i)-ad-|hidden|^hid$| hid$| hid |^hid |banner|combx|comment|com-|contact|foot|footer|footnote|gdpr|masthead|media|meta|outbrain|promo|related|scroll|share|shoutbox|sidebar|skyscraper|sponsor|shopping|tags|tool|widget`)
 	rxByline               = regexp.MustCompile(`(?i)byline|author|dateline|writtenby|p-author`)
+	rxNormalize            = regexp.MustCompile(`(?i)\s{2,}`)
 	rxVideos               = regexp.MustCompile(`(?i)//(www\.)?((dailymotion|youtube|youtube-nocookie|player\.vimeo|v\.qq)\.com|(archive|upload\.wikimedia)\.org|player\.twitch\.tv)`)
 	rxTokenize             = regexp.MustCompile(`(?i)\W+`)
 	rxWhitespace           = regexp.MustCompile(`(?i)^\s*$`)
@@ -409,7 +410,7 @@ func (ps *Parser) getArticleTitle() string {
 	}
 
 	curTitle = strings.TrimSpace(curTitle)
-	curTitle = re2go.NormalizeSpaces(curTitle)
+	curTitle = rxNormalize.ReplaceAllString(curTitle, " ")
 	// If we now have 4 words or fewer as our title, and either no
 	// 'hierarchical' separators (\, /, > or ») were found in the original
 	// title or we decreased the number of words by more than 1 word, use
@@ -1667,7 +1668,7 @@ func (ps *Parser) isWhitespace(node *html.Node) bool {
 func (ps *Parser) getInnerText(node *html.Node, normalizeSpaces bool) string {
 	textContent := strings.TrimSpace(dom.TextContent(node))
 	if normalizeSpaces {
-		textContent = re2go.NormalizeSpaces(textContent)
+		textContent = rxNormalize.ReplaceAllString(textContent, " ")
 	}
 	return textContent
 }
