@@ -58,8 +58,8 @@ func (ps *Parser) CheckDocument(doc *html.Node) bool {
 		}
 
 		matchString := dom.ClassName(node) + " " + dom.ID(node)
-		if rxUnlikelyCandidates.MatchString(matchString) &&
-			!rxOkMaybeItsACandidate.MatchString(matchString) {
+		if RxUnlikelyCandidates.MatchString(matchString) &&
+			!RxOkMaybeItsACandidate.MatchString(matchString) {
 			return false
 		}
 
