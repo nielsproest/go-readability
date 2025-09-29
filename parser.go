@@ -123,9 +123,6 @@ type Parser struct {
 	// DisableJSONLD determines if metadata in JSON+LD will be extracted
 	// or not. Default: false.
 	DisableJSONLD bool
-	// AllowedVideoRegex is a regular expression that matches video URLs that should be
-	// allowed to be included in the article content. If undefined, it will use default filter.
-	AllowedVideoRegex *regexp.Regexp
 
 	doc             *html.Node
 	documentURI     *nurl.URL
@@ -2002,12 +1999,6 @@ func (ps *Parser) cleanConditionally(element *html.Node, tag string) {
 		return
 	}
 
-	// Prepare regex video filter
-	RxVideoVilter := ps.AllowedVideoRegex
-	if RxVideoVilter == nil {
-		RxVideoVilter = RxVideos
-	}
-
 	// Gather counts for other typical elements embedded within.
 	// Traverse backwards so we can remove nodes at the same time
 	// without effecting the traversal.
@@ -2062,13 +2053,13 @@ func (ps *Parser) cleanConditionally(element *html.Node, tag string) {
 				// If this embed has attribute that matches video regex,
 				// don't delete it.
 				for _, attr := range embed.Attr {
-					if RxVideoVilter.MatchString(attr.Val) {
+					if RxVideos.MatchString(attr.Val) {
 						return false
 					}
 				}
 
 				// For embed with <object> tag, check inner HTML as well.
-				if dom.TagName(embed) == "object" && RxVideoVilter.MatchString(dom.InnerHTML(embed)) {
+				if dom.TagName(embed) == "object" && RxVideos.MatchString(dom.InnerHTML(embed)) {
 					return false
 				}
 
