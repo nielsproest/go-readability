@@ -21,6 +21,8 @@ import (
 // All of the regular expressions in use within readability.
 // Defined up here so we don't instantiate them repeatedly in loops *.
 var (
+	rxPositive             = regexp.MustCompile(`(?i)article|body|content|entry|hentry|h-entry|main|page|pagination|post|text|blog|story`)
+	rxNegative             = regexp.MustCompile(`(?i)-ad-|hidden|^hid$| hid$| hid |^hid |banner|combx|comment|com-|contact|foot|footer|footnote|gdpr|masthead|media|meta|outbrain|promo|related|scroll|share|shoutbox|sidebar|skyscraper|sponsor|shopping|tags|tool|widget`)
 	rxVideos               = regexp.MustCompile(`(?i)//(www\.)?((dailymotion|youtube|youtube-nocookie|player\.vimeo|v\.qq)\.com|(archive|upload\.wikimedia)\.org|player\.twitch\.tv)`)
 	rxTokenize             = regexp.MustCompile(`(?i)\W+`)
 	rxWhitespace           = regexp.MustCompile(`(?i)^\s*$`)
@@ -1735,22 +1737,22 @@ func (ps *Parser) getClassWeight(node *html.Node) int {
 
 	// Look for a special classname
 	if nodeClassName := dom.ClassName(node); nodeClassName != "" {
-		if re2go.IsNegativeClass(nodeClassName) {
+		if rxNegative.MatchString(nodeClassName) {
 			weight -= 25
 		}
 
-		if re2go.IsPositiveClass(nodeClassName) {
+		if rxPositive.MatchString(nodeClassName) {
 			weight += 25
 		}
 	}
 
 	// Look for a special ID
 	if nodeID := dom.ID(node); nodeID != "" {
-		if re2go.IsNegativeClass(nodeID) {
+		if rxNegative.MatchString(nodeID) {
 			weight -= 25
 		}
 
-		if re2go.IsPositiveClass(nodeID) {
+		if rxPositive.MatchString(nodeID) {
 			weight += 25
 		}
 	}
